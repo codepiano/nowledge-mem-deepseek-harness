@@ -162,3 +162,7 @@ and Mem smoke test is still required to verify an installed release.
 GitHub Actions runs ESLint and tests on every pull request and push to `main`.
 The test matrix covers Ubuntu and Windows with Node.js 24 and DSH 0.1.7-rc.1,
 0.2.1-alpha.1, and 0.2.1-rc.2. It also checks the npm package contents with `npm pack --dry-run`.
+
+## Local DSH 0.2.1-rc.3 compatibility
+
+This local installation adds the explicit 0.2.1-rc.3 host preview to the optional peer ranges and CI matrix. All 48 native connector tests pass with Node 24.21.0 and the published rc.3 DSH session, LLM, and v3-to-v4 admission packages. The adapter implementation is unchanged. Untested rc.4 and GA versions remain excluded. This compatibility change has not been published upstream.
