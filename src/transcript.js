@@ -1,6 +1,7 @@
 /** DSH user-role rows include injected context; only `user` is human input. */
-export function isHumanInput(message) {
+export function isHumanInput(message, excludedUserRpcIdPattern) {
   return message?.source?.kind === 'user'
+    && !(typeof message.source.rpcId === 'string' && excludedUserRpcIdPattern?.test(message.source.rpcId))
 }
 
 /**
@@ -8,8 +9,8 @@ export function isHumanInput(message) {
  * contain narration as well as arguments; neither is a completed reply.
  * Use structured tags, never text patterns that could erase a real question.
  */
-export function transcriptMessage(event) {
-  if (event.type === 'user/message') return isHumanInput(event.data) ? event.data : undefined
+export function transcriptMessage(event, excludedUserRpcIdPattern) {
+  if (event.type === 'user/message') return isHumanInput(event.data, excludedUserRpcIdPattern) ? event.data : undefined
   if (event.type !== 'assistant/message') return undefined
   const message = event.data.message
   if (message.content.some(block => block.type === 'tool-call')) return undefined

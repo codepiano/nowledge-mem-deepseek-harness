@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.1.7+rc3.1
+
+- Retains explicit rc.3 compatibility and adds opt-in filtering by verified
+  producer RPC IDs for legacy automatic prompts mislabeled as human input.
+  The same policy applies to capture, retries, reconciliation and titles.
+
 ## 0.1.7
 
 - Captures human input and assistant reply text instead of the model execution

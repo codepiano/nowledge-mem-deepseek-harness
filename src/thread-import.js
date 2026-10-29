@@ -13,12 +13,13 @@ export function sessionThreadTitle(
   renderMessage,
   maxMessageChars,
   establishedTitle,
+  excludedUserRpcIdPattern,
 ) {
   if (typeof establishedTitle === 'string' && establishedTitle !== '') return establishedTitle
   for (const event of events) {
     if (event.type !== 'user/message') continue
     const message = event.data
-    if (!isHumanInput(message)) continue
+    if (!isHumanInput(message, excludedUserRpcIdPattern)) continue
     const content = boundText(renderMessage(message).trim(), maxMessageChars)
     const firstLine = content.split(/\r?\n/u).find(line => line.trim() !== '')?.trim()
     if (firstLine !== undefined) return boundText(firstLine, 80)

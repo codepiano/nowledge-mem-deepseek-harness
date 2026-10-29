@@ -218,3 +218,17 @@ test('peer ranges admit the tested host previews and preserve optional runtime p
     }
   }
 })
+
+test('turn-end import applies configured RPC ownership filtering to content and title', async () => {
+  const host = fixture({ contextOnSessionStart: false, recallOnPrompt: false, excludedUserRpcIdPattern: '^bili-whale-[0-9]+$' })
+  host.session.append('user/message', userMessage('Injected persona', { kind: 'user', rpcId: 'bili-whale-1793279469631' }), { surfaceOp: 'append' })
+  host.session.append('user/message', userMessage('Actual owner feedback', { kind: 'user', rpcId: 'persona-real-owner-feedback-20261029' }), { surfaceOp: 'append' })
+  const event = host.session.append('turn/end', { turn: 1, reason: { kind: 'completed' } })
+  host.listeners.get('session/event')(host.session, event)
+  await host.importFinished
+  await setImmediate()
+  assert.equal(host.imports[0].title, 'Actual owner feedback')
+  assert.deepEqual(host.imports[0].messages.map(m => m.content), ['Actual owner feedback'])
+  assert.deepEqual(host.warnings, [])
+  assert.throws(() => fixture({ excludedUserRpcIdPattern: '[' }), SyntaxError)
+})

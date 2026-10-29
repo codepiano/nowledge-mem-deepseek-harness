@@ -166,3 +166,17 @@ The test matrix covers Ubuntu and Windows with Node.js 24 and DSH 0.1.7-rc.1,
 ## Local DSH 0.2.1-rc.3 compatibility
 
 This local installation adds the explicit 0.2.1-rc.3 host preview to the optional peer ranges and CI matrix. All 48 native connector tests pass with Node 24.21.0 and the published rc.3 DSH session, LLM, and v3-to-v4 admission packages. The adapter implementation is unchanged. Untested rc.4 and GA versions remain excluded. This compatibility change has not been published upstream.
+
+### Legacy producer prompts
+
+Some producers send automatic task/persona wrappers through the user RPC, so
+`source.kind` alone cannot distinguish them from human input. Optional
+`excludedUserRpcIdPattern` filters only matching `source.rpcId` values from
+Thread messages and titles, using a Unicode regular expression with no stateful
+flags. It is disabled by default. Configure it only for an owned producer's
+verified request-id contract; message text is never used to guess ownership.
+
+For bili-whale's automatic wake requests, the verified pattern is
+`^bili-whale-[0-9]+$`. This preserves real UI prompts, explicit owner feedback,
+and DM/listen/live request IDs that may carry user feedback. Existing Threads require
+an explicit scoped resync; source logs are never rewritten.

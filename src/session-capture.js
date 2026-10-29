@@ -7,7 +7,7 @@ function buildThreadImportDelta(capture, acknowledgedSeq) {
   const delta = selectUnacknowledgedEvents(capture.events, acknowledgedSeq)
   const messages = []
   for (const event of delta.events) {
-    const message = transcriptMessage(event)
+    const message = transcriptMessage(event, capture.excludedUserRpcIdPattern)
     if (message === undefined) continue
     const role = event.type === 'user/message' ? 'user' : 'assistant'
     const content = boundText(transcriptText(message).trim(), capture.maxMessageChars)
@@ -58,7 +58,10 @@ function buildThreadImportDelta(capture, acknowledgedSeq) {
 export function captureSession(session, options) {
   const events = snapshotSessionEvents(session)
   const sessionId = String(session.header.id)
+  const excludedUserRpcIdPattern = options.excludedUserRpcIdPattern
+    ? new RegExp(options.excludedUserRpcIdPattern, 'u') : undefined
   const capture = {
+    excludedUserRpcIdPattern,
     events,
     session,
     sessionId,
@@ -70,6 +73,7 @@ export function captureSession(session, options) {
       transcriptText,
       options.maxMessageChars,
       options.establishedTitle,
+      excludedUserRpcIdPattern,
     ),
   }
   return {

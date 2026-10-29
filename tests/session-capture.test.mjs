@@ -192,3 +192,19 @@ test('omits reasoning-only, unknown producer and tool-only messages without cont
   assert.equal(result.payload.title, 'Explain <system-reminder> and tool calls')
   assert.equal(result.payload.messages[0].content, result.payload.title)
 })
+
+test('opt-in RPC ownership filters legacy producer prompts without text heuristics or lost human messages', () => {
+  const pattern = '^bili-whale-[0-9]+$'
+  const sources = ['bili-whale-1793279469631', 'bili-whale-listen-1793279469631', 'bili-whale-live-1793279469631', 'ui-human', 'persona-real-owner-feedback-20261029', 'bili-whale-dm-receipt-1', undefined]
+  const rows = sources.map((rpcId, seq) => ({ type: 'user/message', seq, time: events[0].time + seq,
+    data: message(`message-${seq}`, `［身份］literal user text ${seq}`, { kind: 'user', ...(rpcId ? { rpcId } : {}) }),
+  }))
+  const attempt = captureSession(sessionWith(rows), { sourceApp: 'deepseek-harness', maxMessageChars: 16000, excludedUserRpcIdPattern: pattern })
+  const result = attempt.deltaFrom(-1)
+  assert.deepEqual(result.payload.messages.map(m => m.metadata.dsh_seq), [1, 2, 3, 4, 5, 6])
+  assert.equal(result.payload.title, '［身份］literal user text 1')
+  assert.equal(result.acknowledgedSeq, 6)
+  assert.deepEqual(attempt.deltaFrom(3).payload.messages.map(m => m.metadata.dsh_seq), [4, 5, 6])
+  assert.deepEqual(attempt.deltaFrom(-1).payload.messages, result.payload.messages)
+  assert.equal(capture(sessionWith(rows)).deltaFrom(-1).payload.messages.length, 7)
+})

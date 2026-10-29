@@ -50,6 +50,7 @@ export const Config = z.object({
   contextOnSessionStart: z.boolean(),
   recallOnPrompt: z.boolean(),
   syncOnTurnEnd: z.boolean(),
+  excludedUserRpcIdPattern: z.string(),
   allowDangerFullAccessRetry: z.boolean(),
   promptRecallPattern: z.string(),
   recallLimit: z.number(),
@@ -85,6 +86,7 @@ function resolveConfig(config = {}) {
     contextOnSessionStart: config.contextOnSessionStart ?? true,
     recallOnPrompt: config.recallOnPrompt ?? true,
     syncOnTurnEnd: config.syncOnTurnEnd ?? true,
+    excludedUserRpcIdPattern: optionalString(config.excludedUserRpcIdPattern),
     allowDangerFullAccessRetry: config.allowDangerFullAccessRetry ?? false,
     promptRecallPattern: new RegExp(config.promptRecallPattern ?? DEFAULT_PROMPT_RECALL_PATTERN, 'iu'),
     recallLimit: config.recallLimit ?? DEFAULT_RECALL_LIMIT,
@@ -98,6 +100,7 @@ function resolveConfig(config = {}) {
     agentId: optionalString(config.agentId ?? process.env.NMEM_AGENT_ID),
     hostAgentId: optionalString(config.hostAgentId ?? process.env.NMEM_HOST_AGENT_ID),
   }
+  if (resolved.excludedUserRpcIdPattern) new RegExp(resolved.excludedUserRpcIdPattern, 'u')
   requireSafeInteger('recallLimit', resolved.recallLimit, 1)
   requireSafeInteger('maxPromptChars', resolved.maxPromptChars, 1)
   requireSafeInteger('maxContextChars', resolved.maxContextChars, 1)
@@ -279,10 +282,11 @@ async function loadRecallMessage(ctx, config, query, signal, session) {
   return rendered === undefined ? undefined : pluginContextMessage('recall', 'nowledge-mem-recall', rendered)
 }
 
-export function buildThreadImportPayload(session, maxMessageChars, sourceApp = DEFAULT_SOURCE_APP) {
+export function buildThreadImportPayload(session, maxMessageChars, sourceApp = DEFAULT_SOURCE_APP, captureOptions = {}) {
   return captureSession(session, {
     sourceApp,
     maxMessageChars,
+    excludedUserRpcIdPattern: captureOptions.excludedUserRpcIdPattern,
   }).deltaFrom(-1)?.payload
 }
 
@@ -291,6 +295,7 @@ async function importSession(ctx, config, session, cursor) {
     sourceApp: config.sourceApp,
     maxMessageChars: config.maxThreadMessageChars,
     establishedTitle: cursor?.title,
+    excludedUserRpcIdPattern: config.excludedUserRpcIdPattern,
   })
   const { sessionId, title } = capture
   let delta = capture.deltaFrom(cursor?.seq ?? -1)
