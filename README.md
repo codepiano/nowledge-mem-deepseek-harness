@@ -29,7 +29,7 @@ nmem status
 nmem config mcp show --host deepseek-harness
 ```
 
-The adapter supports DSH 0.1.5-rc.2, 0.1.7-rc.1, 0.2.1-alpha.1, and 0.2.1-rc.2. It uses
+The adapter supports DSH 0.1.5-rc.2, 0.1.7-rc.1, 0.2.1-alpha.1, 0.2.1-rc.2, 0.2.1-rc.3, and 0.2.1-rc.5. It uses
 `shell.execute(...).result()` on current hosts and retains the legacy
 `shell.run()` fallback. Injected messages use `source.kind: "plugin:nowledge-mem"`,
 matching DSH's v3-to-v4 migration; existing legacy snapshots are still recognized.
@@ -161,7 +161,7 @@ and Mem smoke test is still required to verify an installed release.
 
 GitHub Actions runs ESLint and tests on every pull request and push to `main`.
 The test matrix covers Ubuntu and Windows with Node.js 24 and DSH 0.1.7-rc.1,
-0.2.1-alpha.1, and 0.2.1-rc.2. It also checks the npm package contents with `npm pack --dry-run`.
+0.2.1-alpha.1, 0.2.1-rc.2, 0.2.1-rc.3, and 0.2.1-rc.5. It also checks the npm package contents with `npm pack --dry-run`.
 
 ## Local DSH 0.2.1-rc.3 compatibility
 
@@ -180,3 +180,7 @@ For bili-whale's automatic wake requests, the verified pattern is
 `^bili-whale-[0-9]+$`. This preserves real UI prompts, explicit owner feedback,
 and DM/listen/live request IDs that may carry user feedback. Existing Threads require
 an explicit scoped resync; source logs are never rewritten.
+
+## Local DSH 0.2.1-rc.5 compatibility
+
+Version `0.1.7+rc5.1` explicitly admits DSH rc.5 without relaxing compatibility checks for untested previews or GA. All 54 connector tests pass against both the alpha.1 baseline and the published rc.5 session, LLM, and v3-to-v4 admission packages on Node 26.8.1; ESLint passes. Context injection, turn-end dialogue capture, and the configured RPC exclusion remain unchanged. CI now includes rc.5 on Ubuntu and Windows; those CI jobs have not been run locally.

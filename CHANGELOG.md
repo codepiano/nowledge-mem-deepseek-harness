@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.7+rc5.1 (local compatibility patch)
+
+- Adds explicit DSH 0.2.1-rc.5 optional peer support and CI coverage after
+  passing all 54 tests with real rc.5 message/session/admission packages.
+- Preserves verified RPC prompt filtering and existing capture behavior;
+  untested rc.4, future previews and 0.2.1 GA remain excluded.
+
+
 ## Unreleased
 
 ## 0.1.7+rc3.1

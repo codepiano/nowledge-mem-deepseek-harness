@@ -46,6 +46,8 @@ jobs:
             cordis: 4.0.5
           - dsh: 0.2.1-rc.3
             cordis: 4.0.5
+          - dsh: 0.2.1-rc.5
+            cordis: 4.0.5
     defaults:
       run:
         shell: bash
